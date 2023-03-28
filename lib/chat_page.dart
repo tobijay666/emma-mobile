@@ -1,45 +1,82 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:emma01/models/chat_message_entity.dart';
 import 'package:emma01/utils/chat_bubble.dart';
+import 'package:emma01/utils/chat_input.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   // final String userName;
   ChatPage({Key? key}) : super(key: key);
 
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   final chatMessageController = TextEditingController();
+
   List<ChatMessageEntity> _messages = [
-    ChatMessageEntity(
-        text: "This is textC ",
-        senderId: '1234',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(name: 'John Doe')),
-    ChatMessageEntity(
-        text: "This is textB ",
-        senderId: '1234',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(name: 'Jane Doe')),
-    ChatMessageEntity(
-        text: "This is textC ",
-        senderId: '1234',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(name: 'John Doe')),
-    ChatMessageEntity(
-        text: "This is textB ",
-        senderId: '1234',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(name: 'Jane Doe')),
-    ChatMessageEntity(
-        text: "This is textC ",
-        senderId: '1234',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        author: Author(name: 'John Doe'))
+    // ChatMessageEntity(
+    //     text: "This is textC ",
+    //     senderId: '1234',
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //     author: Author(name: 'John Doe')),
+    // ChatMessageEntity(
+    //     text: "This is textB ",
+    //     senderId: '1234',
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //     author: Author(name: 'Jane Doe')),
+    // ChatMessageEntity(
+    //     text: "This is textC ",
+    //     senderId: '1234',
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //     author: Author(name: 'John Doe')),
+    // ChatMessageEntity(
+    //     text: "This is textB ",
+    //     senderId: '1234',
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //     author: Author(name: 'Jane Doe')),
+    // ChatMessageEntity(
+    //     text: "This is textC ",
+    //     senderId: '1234',
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //     author: Author(name: 'John Doe'))
   ];
 
-  void onSend() {
-    print('Send');
-    print('ChatMessage: ${chatMessageController.text}');
+  _loadMessages() async {
+    final response = await rootBundle.loadString('assets/mock_messages.json');
+
+    final List<dynamic> decodedList = jsonDecode(response) as List;
+
+    final List<ChatMessageEntity> _chatMessages = decodedList.map((e) {
+      return ChatMessageEntity.fromJson(e);
+    }).toList();
+
+    // print(_chatMessages.length);
+
+    setState(() {
+      _messages = _chatMessages;
+    });
+  }
+
+  void onSendButtonPressed() {
+    final newMessage = ChatMessageEntity(
+        text: chatMessageController.text,
+        senderId: '1234',
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        author: Author(name: "John Doe"));
+    // print(newMessage);
+    onMessageSend(newMessage);
+  }
+
+  onMessageSend(ChatMessageEntity entity) {
+    _messages.add(entity);
+    setState(() {
+      chatMessageController.clear();
+    });
   }
 
   Widget getChatBubble(alignment, message) {
@@ -69,8 +106,15 @@ class ChatPage extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    _loadMessages();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    _loadMessages();
     final userName = ModalRoute.of(context)!.settings.arguments as String;
 
     return Scaffold(
@@ -88,12 +132,12 @@ class ChatPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Flexible(
+          Expanded(
             child: ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 return ChatBubble(
-                    alignment: index % 2 == 0
+                    alignment: _messages[index].author.name == 'Jane Doe'
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
                     // 'Text Message test 0$index.');
@@ -166,6 +210,7 @@ class ChatPage extends StatelessWidget {
               //         bottomLeft: Radius.circular(10),
             ),
           ),
+          // ChatInput(onSubmit: onMessageSend),
           Container(
             height: 50,
             child: Row(
@@ -187,7 +232,9 @@ class ChatPage extends StatelessWidget {
                         border: InputBorder.none),
                   ),
                 ),
-                IconButton(onPressed: onSend, icon: Icon(Icons.send_rounded))
+                IconButton(
+                    onPressed: onSendButtonPressed,
+                    icon: Icon(Icons.send_rounded))
               ],
             ),
             decoration: BoxDecoration(

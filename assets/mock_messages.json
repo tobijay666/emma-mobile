@@ -1,0 +1,26 @@
+[
+    {
+        "author":{ 
+            "name":"John Doe"
+        },
+        "text": "This is textC ",
+        "senderId": "1234",
+        "createdAt": 1542845612456
+    },
+    {
+        "author":{ 
+            "name":"Jane Doe"
+        },
+        "text": "This is textB ",
+        "senderId": "1234",
+        "createdAt": 1542845612456
+    },
+    {
+        "author":{ 
+            "name":"John Doe"
+        },
+        "text": "This is textA ",
+        "senderId": "1234",
+        "createdAt": 1542845612456
+    }
+]
