@@ -20,6 +20,9 @@ class LoginTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       obscureText: hasAsterisk,
+      keyboardType: hasAsterisk
+          ? TextInputType.visiblePassword
+          : TextInputType.emailAddress,
       validator: (value) {
         if (validator != null) {
           return validator(value);
@@ -33,7 +36,7 @@ class LoginTextField extends StatelessWidget {
       },
       controller: controller,
       decoration: InputDecoration(
-        hintText: 'Enter Your Email',
+        hintText: hasAsterisk ? 'Enter Your Password' : 'Enter Your Email',
         hintStyle: ThemeTextStyle.loginHiddenTextFieldStyle,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),

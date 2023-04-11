@@ -1,35 +1,33 @@
 import 'package:emma01/utils/spaces.dart';
-import 'package:emma01/utils/textfield_styles.dart';
 import 'package:emma01/widgets/login_textfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/material.dart';
-
-import 'package:emma01/chat_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 final _formKey = GlobalKey<FormState>();
 
-final userNameController = TextEditingController();
-
-final passwordController = TextEditingController();
-void loginUser(context, _auth) async {
+void regUser(context, _auth) async {
+  // setState(() {
+  //   showSpinner = true;
+  // });
   if (_formKey.currentState!.validate()) {
-    print('Login');
+    print('Register');
     print(userNameController.text);
     print(passwordController.text);
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final User newUser = await _auth.createUserWithEmailAndPassword(
           email: userNameController.text, password: passwordController.text);
-      print("Login Success");
-      User user = userCredential.user!;
-      if (user != null) {
+      if (newUser != null) {
         Navigator.pushReplacementNamed(context, '/chat');
       }
     } catch (e) {
@@ -40,9 +38,13 @@ void loginUser(context, _auth) async {
   }
 }
 
-class _LoginPageState extends State<LoginPage> {
+final userNameController = TextEditingController();
+final passwordController = TextEditingController();
+
+class _RegisterPageState extends State<RegisterPage> {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
+  // User loggedInUser = "";
 
   @override
   void initState() {
@@ -52,9 +54,9 @@ class _LoginPageState extends State<LoginPage> {
 
   // void getCurrentUser() async {
   //   try {
-  //     final userX = await _auth.currentUser;
-  //     if (userX != null) {
-  //       print(userX.email);
+  //     final user = await _auth.currentUser;
+  //     if (user != null) {
+  //       print(user.email);
   //       Navigator.pushReplacementNamed(context, '/chat');
   //       // loggedInUser = user;
   //     }
@@ -88,11 +90,11 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Center(
                   child: Text(
-                'Sign In',
+                'Sign Up',
                 style: TextStyle(fontSize: 40, color: Colors.teal),
               )),
               Text(
-                'Sign In With your E-mail and Password',
+                'Sign Up With your E-mail and Password',
                 textAlign: TextAlign.center,
               ),
 
@@ -169,22 +171,19 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       showSpinner = true;
                     });
-                    loginUser(context, _auth);
-                    setState(() {
-                      showSpinner = false;
-                    });
+                    regUser(context, _auth);
                   },
-                  child: const Text("Sign In")),
+                  child: const Text("Sign Up")),
               InkWell(
                 splashColor: Colors.indigoAccent,
                 onTap: () {
-                  // print("daymn");
-                  Navigator.pushReplacementNamed(context, '/register');
+                  print("daymn");
+                  Navigator.pushReplacementNamed(context, '/login');
                 },
                 child: Column(
                   children: [
                     Text(
-                      "Click here if you don't have an account",
+                      "Click here if you already have an account",
                       style: TextStyle(fontSize: 10),
                     )
                   ],

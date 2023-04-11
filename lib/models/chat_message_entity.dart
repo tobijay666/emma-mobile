@@ -1,12 +1,12 @@
 class ChatMessageEntity {
   String text;
-  String senderId;
+  // String senderId;
   int createdAt;
   Author author;
 
   ChatMessageEntity({
     required this.text,
-    required this.senderId,
+    // required this.senderId,
     required this.createdAt,
     required this.author,
   });
@@ -14,7 +14,7 @@ class ChatMessageEntity {
   factory ChatMessageEntity.fromJson(Map<String, dynamic> json) {
     return ChatMessageEntity(
         text: json['text'],
-        senderId: json['senderId'],
+        // senderId: json['senderId'],
         createdAt: json['createdAt'],
         author: Author.fromJson(json['author']));
   }

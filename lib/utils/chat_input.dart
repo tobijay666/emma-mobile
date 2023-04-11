@@ -16,7 +16,7 @@ class _ChatInputState extends State<ChatInput> {
   void onSendButtonPressed() {
     final newMessage = ChatMessageEntity(
         text: chatMessageController.text,
-        senderId: '1234',
+        // senderId: '1234',
         createdAt: DateTime.now().millisecondsSinceEpoch,
         author: Author(name: "John Doe"));
     // print(newMessage);
