@@ -22,6 +22,26 @@ class _ChatPageState extends State<ChatPage2> {
   late Query<Map<String, dynamic>> _query;
   late Stream<QuerySnapshot<Map<String, dynamic>>> _stream;
   List<Map<String, dynamic>> _messages = [];
+  final _auth = FirebaseAuth.instance;
+
+  var userEmail = "";
+
+  late Future<User?> _user;
+
+  Future<User?> getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        User userX = user;
+        userEmail = userX.email!;
+        print(userX.email);
+        return userX;
+      }
+    } catch (e) {
+      print(e);
+      // return null;
+    }
+  }
 
   // void logOut() {
   //   try {
@@ -37,9 +57,293 @@ class _ChatPageState extends State<ChatPage2> {
   void initState() {
     super.initState();
     _messagesRef = FirebaseFirestore.instance.collection('Messages');
-    _query = _messagesRef.orderBy('createdAt');
+    _query = _messagesRef.orderBy('sender');
     _stream = _query.snapshots();
+    _user = getCurrentUser();
   }
+
+  // Widget _buildChatList() {
+  //   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //     stream: _stream,
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData) return const Text('Loading...');
+  //       print(snapshot.data!.docs.length);
+  //       _messages = snapshot.data!.docs.map((doc) => doc.data()).toList();
+
+  //       if (_messages.isEmpty) {
+  //         return const SizedBox.shrink();
+  //       }
+  //       print(_messages.length);
+  //       return ListView.builder(
+  //         itemCount: _messages.length,
+  //         itemBuilder: (BuildContext context, int index) {
+  //           if (index == 0) {
+  //             // Don't display any message for the first item
+  //             return SizedBox.shrink();
+  //           } else {
+  //             index = index - 1;
+  //           }
+
+  //           final message = _messages[index];
+  //           final sender = message['sender'];
+  //           final text = message['text'];
+
+  //           if (text == null) {
+  //             return const SizedBox.shrink();
+  //           }
+
+  //           final isMe = sender == userEmail;
+
+  //           return Padding(
+  //             padding: const EdgeInsets.all(8.0),
+  //             child: Row(
+  //               mainAxisAlignment:
+  //                   isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+  //               children: <Widget>[
+  //                 if (!isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //                 SizedBox(width: 8),
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: isMe
+  //                         ? CrossAxisAlignment.end
+  //                         : CrossAxisAlignment.start,
+  //                     children: <Widget>[
+  //                       Text(
+  //                         sender,
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.grey.shade800,
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 4),
+  //                       Container(
+  //                         padding: const EdgeInsets.all(8),
+  //                         decoration: BoxDecoration(
+  //                           color: isMe ? Colors.green : Colors.grey.shade200,
+  //                           borderRadius: BorderRadius.only(
+  //                             topLeft: Radius.circular(15),
+  //                             topRight: Radius.circular(15),
+  //                             bottomLeft: isMe
+  //                                 ? Radius.circular(15)
+  //                                 : Radius.circular(0),
+  //                             bottomRight: isMe
+  //                                 ? Radius.circular(0)
+  //                                 : Radius.circular(15),
+  //                           ),
+  //                         ),
+  //                         child: Text(
+  //                           text,
+  //                           style: TextStyle(
+  //                             color: isMe ? Colors.white : Colors.black,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 if (isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //               ],
+  //             ),
+  //           );
+  //           // : SizedBox.shrink();
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  // Widget _buildChatList() {
+  //   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //     stream: _stream,
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData) return const Text('Loading...');
+  //       print(snapshot.data!.docs.length);
+  //       _messages = snapshot.data!.docs.map((doc) => doc.data()).toList();
+
+  //       if (_messages.isEmpty) {
+  //         return const SizedBox.shrink();
+  //       }
+  //       print(_messages.length);
+  //       return ListView.builder(
+  //         itemCount: _messages.length,
+  //         itemBuilder: (BuildContext context, int index) {
+  //           final message = _messages[index];
+  //           final sender = message['sender'];
+  //           final text = message['text'];
+
+  //           if (text == null) {
+  //             return const SizedBox.shrink();
+  //           }
+
+  //           final isMe = sender == userEmail;
+
+  //           return Padding(
+  //             padding: const EdgeInsets.all(8.0),
+  //             child: Row(
+  //               mainAxisAlignment:
+  //                   isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+  //               children: <Widget>[
+  //                 if (!isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //                 SizedBox(width: 8),
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: isMe
+  //                         ? CrossAxisAlignment.end
+  //                         : CrossAxisAlignment.start,
+  //                     children: <Widget>[
+  //                       Text(
+  //                         sender,
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.grey.shade800,
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 4),
+  //                       Container(
+  //                         padding: const EdgeInsets.all(8),
+  //                         decoration: BoxDecoration(
+  //                           color: isMe ? Colors.green : Colors.grey.shade200,
+  //                           borderRadius: BorderRadius.only(
+  //                             topLeft: Radius.circular(15),
+  //                             topRight: Radius.circular(15),
+  //                             bottomLeft: isMe
+  //                                 ? Radius.circular(15)
+  //                                 : Radius.circular(0),
+  //                             bottomRight: isMe
+  //                                 ? Radius.circular(0)
+  //                                 : Radius.circular(15),
+  //                           ),
+  //                         ),
+  //                         child: Text(
+  //                           text,
+  //                           style: TextStyle(
+  //                             color: isMe ? Colors.white : Colors.black,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 if (isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  // Widget _buildChatList() {
+  //   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //     stream: _stream,
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData) return const Text('Loading...');
+  //       if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+  //         return const SizedBox.shrink();
+  //       }
+  //       _messages = snapshot.data!.docs.map((doc) => doc.data()).toList();
+  //       print(_messages.length);
+
+  //       return ListView.builder(
+  //         itemCount: _messages.length,
+  //         itemBuilder: (BuildContext context, int index) {
+  //           final message = _messages[index];
+  //           final sender = message['sender'];
+  //           final text = message['text'];
+
+  //           if (text == null) {
+  //             return const SizedBox.shrink();
+  //           }
+
+  //           final isMe = sender == userEmail;
+
+  //           return Padding(
+  //             padding: const EdgeInsets.all(8.0),
+  //             child: Row(
+  //               mainAxisAlignment:
+  //                   isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+  //               children: <Widget>[
+  //                 if (!isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //                 SizedBox(width: 8),
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: isMe
+  //                         ? CrossAxisAlignment.end
+  //                         : CrossAxisAlignment.start,
+  //                     children: <Widget>[
+  //                       Text(
+  //                         sender,
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.grey.shade800,
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 4),
+  //                       Container(
+  //                         padding: const EdgeInsets.all(8),
+  //                         decoration: BoxDecoration(
+  //                           color: isMe ? Colors.green : Colors.grey.shade200,
+  //                           borderRadius: BorderRadius.only(
+  //                             topLeft: Radius.circular(15),
+  //                             topRight: Radius.circular(15),
+  //                             bottomLeft: isMe
+  //                                 ? Radius.circular(15)
+  //                                 : Radius.circular(0),
+  //                             bottomRight: isMe
+  //                                 ? Radius.circular(0)
+  //                                 : Radius.circular(15),
+  //                           ),
+  //                         ),
+  //                         child: Text(
+  //                           text,
+  //                           style: TextStyle(
+  //                             color: isMe ? Colors.white : Colors.black,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 if (isMe)
+  //                   CircleAvatar(
+  //                     radius: 20,
+  //                     child: Text(sender[0]),
+  //                     backgroundColor: Colors.green[900],
+  //                   ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildChatList() {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -47,19 +351,30 @@ class _ChatPageState extends State<ChatPage2> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Text('Loading...');
 
-        _messages = snapshot.data!.docs.map((doc) => doc.data()).toList();
+        final docs = snapshot.data!.docs;
+        if (docs.isEmpty) return const SizedBox.shrink();
+
+        print(docs.length);
+        _messages = docs.map((doc) => doc.data()).toList();
+        print(_messages.length);
 
         return ListView.builder(
           itemCount: _messages.length,
           itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return const SizedBox.shrink();
+            }
+
             final message = _messages[index];
             final sender = message['sender'];
             final text = message['text'];
+            print(index);
+
             if (text == null) {
               return const SizedBox.shrink();
             }
-            final isMe = sender == 'test@tes.com';
-            // final created = message['createdAt'];
+
+            final isMe = sender == userEmail;
 
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -157,7 +472,7 @@ class _ChatPageState extends State<ChatPage2> {
 
                     await _messagesRef.add({
                       'createdAt': Timestamp.now(),
-                      'sender': 'Alice',
+                      'sender': userEmail,
                       'text': messageText,
                     });
                   },
