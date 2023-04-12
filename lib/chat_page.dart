@@ -35,9 +35,6 @@ class _ChatPageState extends State<ChatPage> {
         User userX = user;
         userEmail = userX.email!;
         print(userX.email);
-
-        // Navigator.pushReplacementNamed(context, '/chat');
-        // loggedInUser = user;
       }
     } catch (e) {
       print(e);
