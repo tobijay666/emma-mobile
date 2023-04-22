@@ -18,6 +18,7 @@ class EmmaApp extends StatelessWidget {
     // TODO: implement build
     return MaterialApp(
       title: "EMMA",
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           colorScheme: ColorScheme.light(primary: BrandColor.primary)),
       // home: ChatPage2(),
