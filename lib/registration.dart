@@ -1,3 +1,6 @@
+import 'package:emma01/login.dart';
+import 'package:emma01/login.dart';
+import 'package:emma01/routes/routes.dart';
 import 'package:emma01/utils/spaces.dart';
 import 'package:emma01/widgets/login_textfield.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,6 +48,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
   // User loggedInUser = "";
+
+  navigateToLogin(context) {
+    Navigator.of(context).pushReplacementNamed(Routes.login);
+  }
 
   @override
   void initState() {

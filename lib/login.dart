@@ -1,8 +1,10 @@
+import 'package:emma01/routes/routes.dart';
 import 'package:emma01/utils/spaces.dart';
 import 'package:emma01/utils/textfield_styles.dart';
 import 'package:emma01/widgets/login_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:emma01/chat_page.dart';
 // import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -18,7 +20,12 @@ final _formKey = GlobalKey<FormState>();
 
 final userNameController = TextEditingController();
 
+navigateToChat(context) {
+  Navigator.of(context).pushReplacementNamed(Routes.chat);
+}
+
 final passwordController = TextEditingController();
+
 void loginUser(context, _auth) async {
   if (_formKey.currentState!.validate()) {
     print('Login');
@@ -30,7 +37,7 @@ void loginUser(context, _auth) async {
       print("Login Success");
       User user = userCredential.user!;
       if (user != null) {
-        Navigator.pushReplacementNamed(context, '/chat');
+        navigateToChat(context);
       }
     } catch (e) {
       print(e);
@@ -44,10 +51,21 @@ class _LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
 
+  navigateToRegister(context) {
+    Navigator.of(context).pushReplacementNamed(Routes.register);
+  }
+
+  Future<void> fetchData() async {
+    final url = Uri.parse('https://2a0a-116-206-246-22.ngrok-free.app/sayhi');
+    final response = await http.get(url);
+    print(response.body);
+  }
+
   @override
   void initState() {
     super.initState();
     // getCurrentUser();
+    // fetchData();
   }
 
   // void getCurrentUser() async {
@@ -175,10 +193,11 @@ class _LoginPageState extends State<LoginPage> {
               child: const Text("Sign In")),
           InkWell(
             splashColor: Colors.indigoAccent,
-            onTap: () {
-              // print("daymn");
-              Navigator.pushReplacementNamed(context, '/register');
-            },
+            onTap: () => navigateToRegister(context),
+            // onTap: () {
+            //   // print("daymn");
+            //   Navigator.pushReplacementNamed(context, '/register');
+            // },
             child: Column(
               children: [
                 Text(

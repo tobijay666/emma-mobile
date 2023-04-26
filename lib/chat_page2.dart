@@ -8,6 +8,7 @@ import 'package:emma01/utils/chat_input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 class ChatPage2 extends StatefulWidget {
   ChatPage2({Key? key}) : super(key: key);
@@ -60,6 +61,19 @@ class _ChatPageState extends State<ChatPage2> {
     _query = _messagesRef.orderBy('sender');
     _stream = _query.snapshots();
     _user = getCurrentUser();
+  }
+
+  Future<String> makePostRequest() async {
+    final url = Uri.https('2a0a-116-206-246-22.ngrok-free.app', 'text');
+    final body = {"test": 'hello!'};
+
+    final response = await http.post(url, body: jsonEncode({"test": "hello!"}));
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to make POST request');
+    }
   }
 
   Widget _buildChatList() {
@@ -177,6 +191,7 @@ class _ChatPageState extends State<ChatPage2> {
                   child: TextField(
                     controller: _textController,
                     decoration: const InputDecoration(
+                      // hintText: 'Enter a message...',
                       hintText: 'Enter a message...',
                     ),
                   ),
@@ -192,6 +207,7 @@ class _ChatPageState extends State<ChatPage2> {
                       'sender': userEmail,
                       'text': messageText,
                     });
+                    print(makePostRequest());
                   },
                 ),
               ],
