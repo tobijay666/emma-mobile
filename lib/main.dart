@@ -1,6 +1,7 @@
 import 'package:emma01/chat_page.dart';
 import 'package:emma01/chat_page2.dart';
 import 'package:emma01/login.dart';
+import 'package:emma01/pages/login_page2.dart';
 import 'package:emma01/registration.dart';
 import 'package:emma01/routes/routes.dart';
 import 'package:emma01/theme/dark_theme.dart';
@@ -27,9 +28,9 @@ class EmmaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: lightTheme(),
       darkTheme: darkTheme(),
-      themeMode: ThemeMode.light,
-      // home: ChatPage2(),
-      home: LoginPage(),
+      themeMode: ThemeMode.system,
+      home: ChatPage(),
+      // home: LoginPage2(),
       onGenerateRoute: Routes.onGenerateRoute,
       // home: RegisterPage(),
       // routes: {
