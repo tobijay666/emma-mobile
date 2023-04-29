@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emma01/routes/routes.dart';
 import 'package:emma01/utils/brandcolor.dart';
 import 'package:emma01/utils/spaces.dart';
@@ -13,6 +14,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -61,7 +63,20 @@ class _SignUpPageState extends State<SignUpPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      // Create user profile in Firestore database with the username
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'username': _usernameController.text.trim(),
+      });
+
+      // Update user profile display name with the username
+      await userCredential.user!
+          .updateDisplayName(_usernameController.text.trim());
+
       print('User signed up with UID: ${userCredential.user!.uid}');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -133,6 +148,31 @@ class _SignUpPageState extends State<SignUpPage> {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _usernameController,
+                    keyboardType: TextInputType.name,
+                    style: TextStyle(color: BrandColor.backgroundLight),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Username';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      labelStyle: TextStyle(color: BrandColor.backgroundLight),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: BrandColor.backgroundLight),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: BrandColor.backgroundLight),
+                      ),
+                    ),
+                  ),
+                  verticleSpace(20),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     controller: _emailController,

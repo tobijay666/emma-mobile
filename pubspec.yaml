@@ -44,6 +44,7 @@ dependencies:
   flutter_riverpod: ^2.0.0-dev.9
   http: ^0.13.5
   firebase_database: ^10.1.1
+  shared_preferences: ^2.1.0
 
 flutter_native_splash:
   color: "#FFFFFF"

@@ -29,8 +29,8 @@ class EmmaApp extends StatelessWidget {
       theme: lightTheme(),
       darkTheme: darkTheme(),
       themeMode: ThemeMode.system,
-      home: ChatPage(),
-      // home: LoginPage2(),
+      // home: ChatPage(),
+      home: LoginPage2(),
       onGenerateRoute: Routes.onGenerateRoute,
       // home: RegisterPage(),
       // routes: {

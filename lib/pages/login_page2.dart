@@ -46,7 +46,12 @@ class _LoginPageState extends State<LoginPage2> {
           ),
         ),
       );
-      Navigator.of(context).pushReplacementNamed(Routes.chat);
+      try {
+        Navigator.of(context).pushNamed(Routes.chat);
+      } catch (e) {
+        // Handle the error
+        print("login error: $e");
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         // Handle user not found error
