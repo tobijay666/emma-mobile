@@ -1,10 +1,6 @@
-// import 'package:emma01/chat/pages/chat_page.dart';
 import 'package:emma01/chat_page.dart';
-import 'package:emma01/chat_page2.dart';
-import 'package:emma01/login.dart';
 import 'package:emma01/pages/login_page2.dart';
 import 'package:emma01/pages/signup_page2.dart';
-import 'package:emma01/registration.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 

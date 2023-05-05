@@ -1,8 +1,5 @@
 import 'package:emma01/chat_page.dart';
-import 'package:emma01/chat_page2.dart';
-import 'package:emma01/login.dart';
 import 'package:emma01/pages/login_page2.dart';
-import 'package:emma01/registration.dart';
 import 'package:emma01/routes/routes.dart';
 import 'package:emma01/theme/dark_theme.dart';
 import 'package:emma01/theme/light_theme.dart';

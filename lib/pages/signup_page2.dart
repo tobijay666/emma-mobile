@@ -15,6 +15,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -69,6 +70,7 @@ class _SignUpPageState extends State<SignUpPage> {
           .doc(userCredential.user!.uid)
           .set({
         'username': _usernameController.text.trim(),
+        'age': _ageController.text.trim(),
       });
 
       // Update user profile display name with the username
@@ -161,6 +163,31 @@ class _SignUpPageState extends State<SignUpPage> {
                     },
                     decoration: InputDecoration(
                       labelText: 'Username',
+                      labelStyle: TextStyle(color: BrandColor.backgroundLight),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: BrandColor.backgroundLight),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: BrandColor.backgroundLight),
+                      ),
+                    ),
+                  ),
+                  verticleSpace(20), // Add some spacing between fields
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    controller: _ageController,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: BrandColor.backgroundLight),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Age';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Age',
                       labelStyle: TextStyle(color: BrandColor.backgroundLight),
                       enabledBorder: UnderlineInputBorder(
                         borderSide:

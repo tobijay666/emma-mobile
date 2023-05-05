@@ -22,6 +22,19 @@ class _LoginPageState extends State<LoginPage2> {
     Navigator.of(context).pushReplacementNamed(Routes.register2);
   }
 
+  Future<void> _resetPassword() async {
+    String email = _emailController.text
+        .trim(); // get the user's email address from a text field or other source
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      // show a success message to the user
+    } catch (e) {
+      // handle any errors that occur (e.g. invalid email address, user not found, etc.)
+      print(e);
+    }
+  }
+
   Future<void> login(BuildContext context) async {
     try {
       UserCredential userCredential =
@@ -202,7 +215,9 @@ class _LoginPageState extends State<LoginPage2> {
                   ),
                   SizedBox(height: 20),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await _resetPassword();
+                    },
                     child: Text(
                       'Forgot password?',
                       style: TextStyle(
