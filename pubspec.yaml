@@ -46,6 +46,8 @@ dependencies:
   firebase_database: ^10.1.1
   shared_preferences: ^2.1.0
   mockito: ^5.4.0
+  video_player: ^2.6.1
+  encrypt: ^5.0.1
 
 flutter_native_splash:
   color: "#FFFFFF"

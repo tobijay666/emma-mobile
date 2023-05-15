@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:encrypt/encrypt.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emma01/utils/brandcolor.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class ChatPage extends StatefulWidget {
   // final User user;
@@ -29,6 +31,27 @@ class _ChatPageState extends State<ChatPage> {
   bool _isMe = false;
   var messagesCollectionx;
   bool _isWaitingForResponse = false;
+  String _URL = "https://2258-220-247-221-156.ngrok-free.app";
+
+  // AES Encryption
+  static const secretOfEmma = AES_MOB_KEY;
+  var key = encrypt.Key.fromUtf8(secretOfEmma);
+  final iv = IV.fromLength(16);
+
+  encryption(Smessage) {
+    final encrypter = Encrypter(AES(key));
+    final encrypted = encrypter.encrypt(Smessage, iv: iv);
+    return encrypted.base64;
+  }
+
+  decryption(Xmessage) {
+    final encrypter = Encrypter(AES(key));
+    Xmessage = Encrypted.fromBase64(Xmessage);
+    final decrypted = encrypter.decrypt(Xmessage, iv: iv);
+    return decrypted;
+  }
+
+  // get sender => null;
 
   void _toggleTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -106,7 +129,8 @@ class _ChatPageState extends State<ChatPage> {
                 height: 1,
               ),
               ListTile(
-                leading: Icon(Icons.brightness_6),
+                leading: Icon(Icons.brightness_6,
+                    color: _isDarkTheme ? BrandColor.greenDark : Colors.black),
                 title: Text(
                   _isDarkTheme ? 'Light Theme' : 'Dark Theme',
                   style: TextStyle(
@@ -122,7 +146,25 @@ class _ChatPageState extends State<ChatPage> {
                 height: 1,
               ),
               ListTile(
-                leading: Icon(Icons.logout),
+                leading: Icon(Icons.download,
+                    color: _isDarkTheme ? BrandColor.greenDark : Colors.black),
+                title: Text(
+                  'Get Report',
+                  style: TextStyle(
+                    color: _isDarkTheme ? Colors.white : Colors.black,
+                  ),
+                ),
+                onTap: () {
+                  _GenerateReport();
+                },
+              ),
+              Divider(
+                color: _isDarkTheme ? Colors.white : Colors.black,
+                height: 1,
+              ),
+              ListTile(
+                leading: Icon(Icons.logout,
+                    color: _isDarkTheme ? BrandColor.greenDark : Colors.black),
                 title: Text(
                   'Log Out',
                   style: TextStyle(
@@ -195,7 +237,9 @@ class _ChatPageState extends State<ChatPage> {
                         return SizedBox.shrink();
                       }
                     } else {
-                      String message = messages![index].get('message');
+                      String messageEnc = messages![index].get('message');
+                      String message = decryption(messageEnc);
+
                       String sender = messages[index].get('sender');
                       String sentto = messages[index].get('sentto');
                       // bool isMe = sender == _user?.displayName;
@@ -234,16 +278,24 @@ class _ChatPageState extends State<ChatPage> {
                                       sender,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            isMe ? Colors.white : Colors.black,
+                                        color: isMe
+                                            ? (_isDarkTheme
+                                                ? Color.fromARGB(
+                                                    255, 29, 29, 29)
+                                                : Colors.white)
+                                            : Colors.black,
                                       ),
                                     ),
                                     SizedBox(height: 5),
                                     Text(
                                       message,
                                       style: TextStyle(
-                                        color:
-                                            isMe ? Colors.white : Colors.black,
+                                        color: isMe
+                                            ? (_isDarkTheme
+                                                ? Color.fromARGB(
+                                                    255, 29, 29, 29)
+                                                : Colors.white)
+                                            : Colors.black,
                                       ),
                                     ),
                                   ],
@@ -273,14 +325,23 @@ class _ChatPageState extends State<ChatPage> {
                         controller: _textController,
                         decoration: InputDecoration(
                           hintText: 'Type a message',
-                          hintStyle: TextStyle(color: Colors.grey),
+                          hintStyle: TextStyle(
+                              color: _isDarkTheme
+                                  ? BrandColor.greyLight
+                                  : BrandColor.greyDark),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
+                            borderSide: BorderSide(
+                                color: _isDarkTheme
+                                    ? BrandColor.greyLight
+                                    : BrandColor.greyDark),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
+                            borderSide: BorderSide(
+                                color: _isDarkTheme
+                                    ? BrandColor.greyLight
+                                    : BrandColor.greyDark),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -321,154 +382,9 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
-    //       Row(
-    //         children: [
-    //           Expanded(
-    //             child: Padding(
-    //               padding: const EdgeInsets.all(8.0),
-    //               child: Stack(
-    //               children:[ TextField(
-    //                 controller: _textController,
-    //                 decoration: InputDecoration(
-    //                   hintText: 'Type a message',
-    //                   hintStyle: TextStyle(color: Colors.grey),
-    //                   border: OutlineInputBorder(
-    //                     borderRadius: BorderRadius.circular(10),
-    //                     borderSide: BorderSide.none,
-    //                   ),
-    //                   enabledBorder: OutlineInputBorder(
-    //                     borderRadius: BorderRadius.circular(10),
-    //                     borderSide: BorderSide.none,
-    //                   ),
-    //                   focusedBorder: OutlineInputBorder(
-    //                     borderRadius: BorderRadius.circular(10),
-    //                     borderSide: BorderSide(color: Color(0xFF00A884)),
-    //                   ),
-    //                   contentPadding:
-    //                       EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-    //                   // suffixIcon: IconButton(
-    //                   //   icon: Icon(Icons.send, color: Color(0xFF00A884)),
-    //                   //   onPressed: _sendMessage,
-    //                   // ),
-    //                 ),
-    //               ),
-    //                if (_isWaitingForResponse)
-    //           Positioned(
-    //             right: 40.0,
-    //             bottom: 10.0,
-    //             child: SizedBox(
-    //               width: 20.0,
-    //               height: 20.0,
-    //               child: CircularProgressIndicator(
-    //                 strokeWidth: 3.0,
-    //               ),
-    //             ),
-    //           ),
-    //               ],
-    //               ),
-    //             ),
-    //           ),
-    //           IconButton(
-    //   icon: Icon(Icons.send_rounded,
-    //       size: 30, color: BrandColor.greenDark),
-    //   onPressed: () {
-    //     setState(() {
-    //       _isWaitingForResponse = true;
-    //     });
-    //               _sendMessage().then((value) {
-    //       setState(() {
-    //         _isWaitingForResponse = false;
-    //       });
-    //     });
-    //   },
-    // ),
-    //   endDrawer: Drawer(
-    //     child: Container(
-    //       color: _isDarkTheme ? Colors.grey[800] : Colors.grey[200],
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           Container(
-    //             margin: EdgeInsets.only(top: 50, left: 20, bottom: 20),
-    //             child: Text(
-    //               'Settings',
-    //               style: TextStyle(
-    //                 fontSize: 24,
-    //                 fontWeight: FontWeight.bold,
-    //                 color: _isDarkTheme ? Colors.white : Colors.black,
-    //               ),
-    //             ),
-    //           ),
-    //           Divider(
-    //             color: _isDarkTheme ? Colors.white : Colors.black,
-    //             height: 1,
-    //           ),
-    //           ListTile(
-    //             leading: Icon(Icons.brightness_6),
-    //             title: Text(
-    //               _isDarkTheme ? 'Light Theme' : 'Dark Theme',
-    //               style: TextStyle(
-    //                 color: _isDarkTheme ? Colors.white : Colors.black,
-    //               ),
-    //             ),
-    //             onTap: () {
-    //               _toggleTheme();
-    //             },
-    //           ),
-    //           Divider(
-    //             color: _isDarkTheme ? Colors.white : Colors.black,
-    //             height: 1,
-    //           ),
-    //           ListTile(
-    //             leading: Icon(Icons.logout),
-    //             title: Text(
-    //               'Log Out',
-    //               style: TextStyle(
-    //                 color: _isDarkTheme ? Colors.white : Colors.black,
-    //               ),
-    //             ),
-    //             onTap: () {
-    //               _logOut();
-    //             },
-    //           ),
-    //           Divider(
-    //             color: _isDarkTheme ? Colors.white : Colors.black,
-    //             height: 1,
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // ),],),);
   }
 
-  // Widget _buildTypingIndicator() {
-  //   return Container(
-  //     margin: EdgeInsets.symmetric(vertical: 8.0),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       children: <Widget>[
-  //         SizedBox(
-  //           width: 40.0,
-  //           height: 40.0,
-  //           child: CircularProgressIndicator(
-  //             valueColor: AlwaysStoppedAnimation<Color>(
-  //               Theme.of(context).accentColor,
-  //             ),
-  //           ),
-  //         ),
-  //         SizedBox(width: 8.0),
-  //         Text(
-  //           'typing...',
-  //           style: TextStyle(
-  //             fontSize: 16.0,
-  //             color: Theme.of(context).accentColor,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  // Send a message to the AI Agent
 
   // Create a new chat bubble widget to represent the waiting message bubble
   Widget _buildWaitingMessage() {
@@ -514,21 +430,12 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-//  void _sendbyEMMA async( String messageEmma){
-
-//       await _messagesCollection.add({
-//         'message': messageEmma[message],
-//         'sender': 'EMMA',
-//         'timestamp': FieldValue.serverTimestamp(),
-//       });
-//       _textController.clear();
-//  }
 
   void _getResponse(String message, String sender) async {
     setState(() {
       _isWaitingForResponse = true;
     });
-    String url = 'https://4118-112-134-196-203.ngrok-free.app/text';
+    String url = '$_URL/text';
     Map<String, String> headers = {'Content-Type': 'application/json'};
     Map<String, String> jsonBody = {'message': message, 'sender': sender};
 
@@ -540,8 +447,9 @@ class _ChatPageState extends State<ChatPage> {
       String replyMessage = responseData['message'];
       String sender = responseData['sender'] ?? "EMMA";
 
+      String encryptedMessage = encryption(replyMessage);
       await _messagesCollection.add({
-        'message': replyMessage,
+        'message': encryptedMessage,
         'sender': sender,
         'sentto': _user?.displayName,
         'timestamp': FieldValue.serverTimestamp(),
@@ -560,13 +468,61 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  void _GenerateReport() async {
+    String? userName = _auth.currentUser?.displayName;
+    String? email = _auth.currentUser?.email;
+
+    if (userName == null || email == null) {
+      return;
+    } else {
+      String url = '$_URL/report';
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      Map<String, String> jsonBody = {'username': userName, 'email': email};
+
+      var response = await http.post(Uri.parse(url),
+          headers: headers, body: json.encode(jsonBody));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Response'),
+                content: Text(response.body),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        });
+
+        // setState(() {
+        //   _isTyping = false;
+        // });
+      } else {
+        print('Error: ${response.reasonPhrase}');
+        // setState(() {
+        //   _isTyping = false;
+        // });
+      }
+    }
+  }
+
   _sendMessage() async {
     String message = _textController.text.trim();
     if (message.isNotEmpty) {
       String? sender =
           _auth.currentUser?.displayName; // Replace with actual user name
+      String encryptedMessage = encryption(message);
       await _messagesCollection.add({
-        'message': message,
+        'message': encryptedMessage,
         'sender': sender,
         'sentto': 'EMMA',
         'timestamp': FieldValue.serverTimestamp(),
@@ -574,25 +530,6 @@ class _ChatPageState extends State<ChatPage> {
       _textController.clear();
       _getResponse(message, sender!);
       // return true;
-
-      // // Send message to API and get response
-      // var response = await http.post(
-      //   Uri.parse('https://6a1a-112-134-194-161.ngrok-free.app/text'),
-      //   body: jsonEncode({
-      //     'message': message,
-      //     'sender': sender,
-      //   }),
-      //   headers: {'Content-Type': 'application/json'},
-      // );
-
-      // if (response.statusCode == 200) {
-      //   // Handle successful response
-      //   print(response.body);
-      //   _sendbyEMMA(response.body);
-      // } else {
-      //   // Handle error response
-      //   print(response.body);
-      // }
     }
   }
 }
